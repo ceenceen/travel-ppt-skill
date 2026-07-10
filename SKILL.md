@@ -1,0 +1,160 @@
+---
+name: travel-ppt
+description: 把结构化行程数据渲染成 16:9 可编辑旅行 PPTX。支持两种模式：① 城市多日游（Pexels 实拍 + 单栏背景）；② 自驾 / 户外环线（真实路线地图 + 每日双框排版：全幅背景 + 右上真实地图 + 右下景点图原比例 + 左列四块文字）。触发词：行程PPT / 旅行PPT / 旅游攻略PPT / 自驾PPT / 环线PPT / itinerary slideshow / travel deck / roadtrip PPT / self-drive itinerary。
+version: 2.0.0
+disable: false
+---
+
+# Travel PPT — 行程幻灯片生成器（双语 / Bilingual）
+# Travel PPT — Itinerary Slides Generator (Bilingual)
+
+把一份**结构化行程数据**渲染成 16:9 可编辑 PPTX：封面 → 路线总览 → 关键数据 → **每天单独一页** → 预算 → 住宿 → 收尾。
+Render a **structured itinerary** into an editable 16:9 PPTX: cover → route overview → key stats → **one slide per day** → budget → stay → closing.
+
+本 skill 含两种模式 / This skill ships two modes:
+
+- **模式 A · 城市多日游 City Multi-day Tour**：Pexels 精准实拍作背景（非黑白），单栏排版。见 `scripts/gen_pptx.py` + `templates/trip_data_template.py`。
+- **模式 B · 自驾 / 户外环线 Roadtrip / Outdoor Loop**：全幅背景 + 右上**真实路线地图**（高德卫星瓦片）+ 右下**当天景点图（原比例）** + 左列四块文字。见 `scripts/gen_maps.py` + `scripts/gen_pptx_roadtrip.py` + `templates/roadtrip_data_template.py` + `references/roadtrip_layout.md`。
+
+---
+
+## 何时使用 / When to use
+- 用户有多日行程（天数 ≥ 3），想要可放映/打印的行程册。
+  User has a multi-day trip (≥3 days) and wants a presentable/printable deck.
+- 提到「每天一页」「行程PPT」「旅行PPT」「自驾PPT」「旅游攻略PPT」「itinerary / travel deck / roadtrip PPT」。
+  Mentions "one slide per day", "itinerary PPT", "travel deck", "roadtrip PPT", etc.
+- 自驾/环线类行程 → 优先**模式 B**（带真实地图）；城市观光类 → **模式 A**。
+  Self-drive / loop trips → prefer **Mode B** (with real map); city tours → **Mode A**.
+
+---
+
+# 模式 B · 自驾 / 户外环线（重点） Mode B · Roadtrip / Outdoor Loop (focus)
+
+适用：自驾、摩旅、骑行、徒步等有明确逐日路线与 GPS 坐标的行程。
+For: self-drive, motorcycle, cycling, trekking — any trip with a day-by-day route and GPS coordinates.
+
+## 每日页版式 / Daily page layout
+每页四区（详见 `references/roadtrip_layout.md`）：
+Four zones per slide (see `references/roadtrip_layout.md`):
+
+1. **全幅背景 Full-bleed background**：通用风光照 cover 铺满 + 暗化层（保证文字可读）。
+2. **顶部标题 Top title**：日期标签 + 路线名 + 数据条（里程 / 时长 / 最高海拔）。
+3. **左列四块 Left column (4 blocks)**：▸ 行程说明 / ▸ 经典介绍 / ▸ 注意事项 / ▸ 住宿点。
+4. **右上双框 Right-top two frames**：
+   - 上框 = **真实路线地图**（gen_maps.py 产出，高德卫星底图 + 轨迹标绘）。
+   - 下框 = **当天景点图**（保持原比例 contain 居中，不拉伸；右上角带景点名标注）。
+
+## 数据约定 / Data schema
+数据放在旅行目录下的 `trip_data.py`，同时被 `gen_maps.py` 与 `gen_pptx_roadtrip.py` 共用。
+Put data in `trip_data.py` inside your trip folder; shared by both scripts.
+
+```python
+import os
+DECK_DIR = os.getcwd()
+TRIP_TITLE = '阿里南线自驾环线'
+
+# 地点经纬度 (WGS-84)。国内地图需 GCJ-02，gen_maps.py 内部自动转换。
+NODE = {'拉萨': (91.13, 29.65), '羊湖(岗巴拉)': (90.70, 28.95), ...}
+# 逐日路线：(day, 起点, [途经点...], 终点, 里程km)
+DAYS = [(1, '拉萨', ['羊湖(岗巴拉)','卡若拉冰川','江孜'], '日喀则', '360'), ...]
+# 图片路径函数（按你的素材命名调整）
+def get_img(idx): return os.path.join(DECK_DIR,'images',f'landscape-{idx:02d}.jpg')
+def get_spot(day): return os.path.join(DECK_DIR,'spot_photos',f'spot_{day}.png')
+def get_map(day): return os.path.join(DECK_DIR,'maps',f'day_map_{day}.png')
+
+# 页面序列 S：元素 (类型, 数据dict)。类型: cover/section/stats/day/tips/closing
+S = [
+  ('cover', {'img': get_img(1), 'word':'阿里南线', 'sub':'14天自驾环线', 'meta':'8.10–8.23'}),
+  ('day', {'img': get_spot(1), 'bg': get_img(6), 'map': get_map(1),
+           'day_label':'DAY 1 · 8.10', 'route':'拉萨 → 日喀则', 'km':'360', 'time':'6h',
+           'highest_alt':'3836m',
+           'trip':[...], 'intro':[...], 'caution':[...], 'stay':[...]}),
+  ...
+]
+```
+完整可运行模板见 `templates/roadtrip_data_template.py`（含阿里南线 14 天全量数据）。
+Full runnable template: `templates/roadtrip_data_template.py` (Ali-Nan line 14-day sample).
+
+## 图片管线 / Image pipeline
+1. **背景 / 通用风光照 Background**：用户自备横版图（≥1920×1080），放 `images/`，cover 铺满。
+2. **真实路线地图 Real route map**：`gen_maps.py` 下载高德卫星瓦片（style=6）+ 中文注记（style=8），
+   按 WGS-84→GCJ-02 转换坐标，紧贴当天路线缩放（5% 边距），标绘起点/住宿点/途经点/指北针，输出 `maps/day_map_{day}.png`（1180×400）。
+3. **当天景点图 Spot photo**：优先精准实拍（Pexels/自备）；对中国小众地标用 **ImageGen 工具**按精准地标提示词生成写实图（1536×1024），
+   放 `spot_photos/spot_{day}.png`，**contain 原比例**嵌入下框（绝不拉伸压扁）。
+
+## 生成命令 / Build
+```bash
+cd /path/to/your/trip        # 旅行目录（含 trip_data.py、images/、spot_photos/）
+python <skill>/scripts/gen_maps.py            # 先：生成 maps/day_map_*.png（需联网）
+python <skill>/scripts/gen_pptx_roadtrip.py   # 后：生成 <TRIP_TITLE>-roadtrip.pptx
+```
+- 若输出 PPTX 被用户打开导致 `PermissionError`，脚本自动换名输出（不阻塞）。
+- 改行程只需改 `trip_data.py` 的对应 day dict，重新运行即可，无需改布局代码。
+
+---
+
+# 模式 A · 城市多日游（保留） Mode A · City Multi-day Tour (legacy)
+
+适用：城市游、多城串联，无逐日 GPS 路线。背景用 Pexels 精准实拍（非黑白）。
+For city tours without per-day GPS routes. Background uses Pexels precise photos (not B/W).
+
+## 数据约定 / Data schema
+`templates/trip_data_template.py` 定义 `days` / `hotels` / `timeline` / `budget` / `photo_map` / `TRIP_TITLE` 等。
+
+## 图片管线 / Image pipeline
+1. **优先 Pexels 实拍**：`scripts/fetch_trip.py` 按精准英文关键词搜索，按 `alt` 相关性打分 + 排除错城词，自动挑最贴合图。
+2. **Pexels 无精准图 → ImageGen 生成**：对中国小众地标用 ImageGen 定点生成（100% 贴合），再后处理统一风格。
+3. **后处理**：所有图裁到 1920×1080，压暗 0.82 + 提饱和 1.05 + 提对比 1.06，**不要 duotone/灰度**（用户要求背景非黑白）。
+
+## 生成命令 / Build
+```bash
+python scripts/gen_pptx.py <数据模块.py> <输出.pptx> [--photos ppt_assets/photos] [--budget 预算.xlsx] [--cover-slug cover]
+```
+
+---
+
+## 排版规范（模式 B）/ Layout spec (Mode B)
+权威坐标见 `references/roadtrip_layout.md`。要点：
+Authoritative coordinates in `references/roadtrip_layout.md`. Key points:
+- 画布 13.33×7.5 in；左列 x=0.8 宽 5.8；右列 x=6.9 宽 5.9。
+- 右上双框：上框地图 (6.9,3.05,5.9,2.0)；下框景点图 (6.9,5.15,5.9,2.0) **contain 原比例**。
+- 背景用 cover 铺满（按原比例缩放、溢出裁切），**绝不拉伸**。
+
+## 配色与字体 / Palette & fonts
+- 黑底 BK=(0,0,0)；白 W=(255,255,255)；次要灰 G=(167,167,167)；深灰 DG=(111,111,111)；浅正文 VL=(242,242,242)。
+- 强调色 ACCENT=(232,109,78) 橘（块标题、轨迹线、住宿星标）。地图轨迹橙 `#ff8c2e`、起点青 `#39d6ff`、途经橙 `#ffc078`。
+- 字体：微软雅黑（地图中文 `C:/Windows/Fonts/msyh.ttc`，非 Windows 回退默认）。标题 34–84pt，正文 12–24pt。
+
+## 校验（必做）/ Validate (required)
+生成后遍历所有 shape，检查 `left+width ≤ slide_w+0.05in` 且 `top+height ≤ slide_h+0.05in`（越界即错位）；
+并确认每日页景点图 `width/height ≈ 原图比例`（未被拉伸）。
+After build, scan all shapes for overflow; confirm each daily spot image keeps its original aspect ratio (no stretch).
+
+```python
+from pptx import Presentation
+p = Presentation(out); SW, SH = p.slide_width, p.slide_height
+bad = 0
+for s in p.slides:
+    for sh in s.shapes:
+        if None not in (sh.left, sh.top, sh.width, sh.height):
+            if sh.left+sh.width > SW+45720 or sh.top+sh.height > SH+45720:
+                bad += 1
+print("越界 shape 数:", bad)
+```
+
+## 依赖 / Dependencies
+- 模式 B：`python-pptx`、`Pillow`、`numpy`、`matplotlib`（生成地图需联网下载高德瓦片）。
+- 模式 A：`python-pptx`、`Pillow`、`openpyxl`（读预算表）、`requests`（Pexels）。
+- managed python 缺包：`python -m pip install python-pptx Pillow numpy matplotlib openpyxl`。
+
+## 经验沉淀 / Lessons learned
+- 自驾/环线行程，**真实地图比手绘色块强得多**；高德瓦片国内直连免 key，但坐标是 GCJ-02，需把 GPS(WGS-84) 先转换。
+  Real maps beat hand-drawn blocks; AMap tiles are key-free in CN but use GCJ-02 — convert WGS-84 first.
+- 景点图务必 **contain 原比例**，否则横框会把竖图/方图压扁变形（常见返工点）。
+  Always contain spot images at native ratio; stretching into a wide frame is a common rework cause.
+- 背景图用 **cover 铺满**（按原比例缩放+裁切），比固定尺寸拉伸更专业。
+  Use cover (scale+crop) for full-bleed backgrounds, never fixed-size stretch.
+- 改行程只改 `trip_data.py`，生成器自动重建，无需动布局代码。
+  Edit only `trip_data.py` to change itinerary; the generator rebuilds automatically.
+- PPTX 被用户打开会锁文件导致 `PermissionError`，脚本自动换名即可，不要阻塞。
+  An open PPTX locks the file; the script auto-renames output — never block on it.
