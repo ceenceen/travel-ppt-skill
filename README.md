@@ -66,8 +66,10 @@ travel-ppt-skill/
 ├── templates/
 │   ├── trip_data_template.py      # 模式 A 数据模板
 │   └── roadtrip_data_template.py  # 模式 B 数据模板（含阿里南线 14 天全量示例）
-└── references/
-    └── roadtrip_layout.md         # 模式 B 权威排版规格（坐标 / 配色 / 字体）
+├── references/
+│   └── roadtrip_layout.md         # 模式 B 权威排版规格（坐标 / 配色 / 字体）
+└── examples/
+    └── 西藏自驾环线-Tibet-self driving.pdf   # 案例：用本 skill 生成的阿里南线 14 天自驾环线 PPT（双语）
 ```
 
 ### 配置 Pexels API Key（首次使用前）
@@ -124,6 +126,10 @@ python <skill>/scripts/gen_pptx.py <数据模块.py> <输出.pptx> \
 - 模式 A：`python-pptx`、`Pillow`、`openpyxl`、`requests`（Pexels）。
 - 安装：`python -m pip install python-pptx Pillow numpy matplotlib openpyxl requests`
 
+### 案例 / Examples
+
+- `examples/西藏自驾环线-Tibet-self driving.pdf` — 用本 skill（模式 B · 自驾环线）生成的**阿里南线 14 天自驾环线**行程册样例：全幅背景 + 右上真实路线地图 + 右下当天景点图（原比例）+ 左列四块文字。可直接打开参考版式与排版。
+
 ---
 
 ## English
@@ -162,8 +168,10 @@ travel-ppt-skill/
 ├── templates/
 │   ├── trip_data_template.py      # Mode A data template
 │   └── roadtrip_data_template.py  # Mode B data template (full Ali-Nan 14-day sample)
-└── references/
-    └── roadtrip_layout.md         # Mode B authoritative layout spec (coords / palette / fonts)
+├── references/
+│   └── roadtrip_layout.md         # Mode B authoritative layout spec (coords / palette / fonts)
+└── examples/
+    └── 西藏自驾环线-Tibet-self driving.pdf   # Sample: Ali-Nan 14-day roadtrip PPT built with this skill (bilingual)
 ```
 
 ### Configure Pexels API Key (before first use)
@@ -219,6 +227,10 @@ After building, scan for overflowing shapes with the validation snippet at the e
 - Mode B: `python-pptx`, `Pillow`, `numpy`, `matplotlib` (map gen needs network).
 - Mode A: `python-pptx`, `Pillow`, `openpyxl`, `requests` (Pexels).
 - Install: `python -m pip install python-pptx Pillow numpy matplotlib openpyxl requests`
+
+### Examples
+
+- `examples/西藏自驾环线-Tibet-self driving.pdf` — a sample **Ali-Nan 14-day self-drive loop** deck built with this skill (Mode B · Roadtrip): full-bleed background + top-right real route map + bottom-right spot photo (native ratio) + 4-block left column. Open it to see the layout.
 
 ---
 
