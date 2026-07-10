@@ -127,6 +127,12 @@ python <skill>/scripts/gen_pptx.py <数据模块.py> <输出.pptx> \
 - 安装：`python -m pip install python-pptx Pillow numpy matplotlib openpyxl requests`
 
 ### 案例 / Examples
+<img width="1604" height="897" alt="image" src="https://github.com/user-attachments/assets/9fda3ea7-c7a3-45f7-b586-6add91e9f440" /><img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/66ef0201-f3b7-4ec8-ac88-948ba2aae1c9" />
+<img width="1603" height="901" alt="image" src="https://github.com/user-attachments/assets/9ac0955f-0522-4fc4-8230-8aeb48379d03" /><img width="1602" height="899" alt="image" src="https://github.com/user-attachments/assets/818c332c-a6b4-468a-a825-cbd3885dfc2b" />
+<img width="1606" height="908" alt="image" src="https://github.com/user-attachments/assets/c88da36f-ea6e-4746-ad06-6540ab78f015" />
+<img width="1601" height="896" alt="image" src="https://github.com/user-attachments/assets/63551a81-17e1-45bf-8008-033d16e65e1d" />
+
+
 
 - `examples/西藏自驾环线-Tibet-self driving.pdf` — 用本 skill（模式 B · 自驾环线）生成的**阿里南线 14 天自驾环线**行程册样例：全幅背景 + 右上真实路线地图 + 右下当天景点图（原比例）+ 左列四块文字。可直接打开参考版式与排版。
 
