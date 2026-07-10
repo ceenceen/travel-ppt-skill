@@ -18,6 +18,33 @@ Render a **structured itinerary** into an editable 16:9 PPTX: cover → route ov
 
 ---
 
+## 前置配置：Pexels API Key / Prerequisite: Pexels API Key
+
+模式 A（城市游）默认用 **Pexels 高清实拍** 作背景，首次使用前需配置一个免费的 Pexels API Key（约 1 分钟）。
+Mode A (city tour) uses **Pexels high-res photos** for backgrounds by default; configure a free Pexels API Key before first use (~1 min).
+
+获取与配置 / Get & configure:
+1. 打开 https://www.pexels.com/api/ ，注册/登录后点「Get Started」免费申请一个 API Key。
+   Go to https://www.pexels.com/api/ , sign in and click "Get Started" to get a free API key.
+2. 配置方式二选一 / Either way works:
+   - **环境变量（推荐）**：设置 `PEXELS_API_KEY=你的key`，脚本自动读取。
+     **Env var (recommended)**: set `PEXELS_API_KEY=your_key`; the script reads it automatically.
+   - **密钥文件**：把 key 写进 `scripts/pexels_key.txt`（一行，纯 key，可加 `#` 注释）。
+     **Key file**: put the key in `scripts/pexels_key.txt` (one line, the key only; `#` for comments).
+3. 验证 / Verify: `python scripts/fetch_trip.py --map '{"beijing":["Forbidden City Beijing"]}'` 能抓到图即配置成功。
+   `python scripts/fetch_trip.py --map '{"beijing":["Forbidden City Beijing"]}'` fetches an image → config OK.
+
+图片策略（重要）/ Image strategy (important):
+- **优先 Pexels 真实摄影**：有对应高清实拍就直接用，画面真实、版权可溯源（脚本会生成 `CREDITS.txt` 署名）。
+  **Prefer Pexels real photography**: use it whenever a matching high-res shot exists — authentic and attributable (script writes `CREDITS.txt`).
+- **Pexels 无合适图 → 再用 AI 生成**：仅当某目的地/小众地标在 Pexels 上搜不到贴合图（如 alt 全是别的城市）时，才回退 ImageGen 按地标提示词生成写实图。
+  **Fall back to AI only when Pexels has no match**: only when a destination/obscure landmark has no fitting Pexels shot (e.g. alt text is all wrong cities), use ImageGen with a landmark-specific prompt.
+
+> 注意：Pexels 要求署名，生成的 `CREDITS.txt` 请随 deck 保留。Key 属私密，不要把它提交进公开的 skill 仓库。
+> Note: Pexels requires attribution — keep the generated `CREDITS.txt` with the deck. Keep the key private; never commit it into a public skill repo.
+
+---
+
 ## 何时使用 / When to use
 - 用户有多日行程（天数 ≥ 3），想要可放映/打印的行程册。
   User has a multi-day trip (≥3 days) and wants a presentable/printable deck.
@@ -38,7 +65,7 @@ This skill depends heavily on structured data. If the user only says "make a tra
 - **模式 B 缺什么 What Mode B needs**:
   - 逐日路线 day-by-day route（每天 起点→途经→终点）。坐标(WGS-84)最好给；不给则问能否按地名推断或请用户补，绝不编造。
   - 每日文案 per-day copy：行程说明 / 经典介绍 / 注意事项 / 住宿点。缺失则请用户直接给，或由 agent 据路线先起草、再让用户改。
-  - 图片策略 image strategy：背景风光照 + 当天景点图，用「AI 生成 / Pexels 实拍 / 用户自备」哪种？先定策略再生成。
+  - 图片策略 image strategy：背景风光照 + 当天景点图。**默认优先 Pexels 实拍**；仅当 Pexels 搜不到对应合适图时再用 AI 生成 / 用户自备。先定策略再生成。
 - **模式 A 缺什么 What Mode A needs**: 行程标题、城市/天数、酒店、预算；背景图关键词或自备图。Pexels 需要关键词，缺失则问。
 - **输出偏好 output prefs**: 文件名、是否要预算页/住宿页、语言（中文 / 中英双语）。
 
@@ -98,7 +125,7 @@ Full runnable template: `templates/roadtrip_data_template.py` (Ali-Nan line 14-d
 1. **背景 / 通用风光照 Background**：用户自备横版图（≥1920×1080），放 `images/`，cover 铺满。
 2. **真实路线地图 Real route map**：`gen_maps.py` 下载高德卫星瓦片（style=6）+ 中文注记（style=8），
    按 WGS-84→GCJ-02 转换坐标，紧贴当天路线缩放（5% 边距），标绘起点/住宿点/途经点/指北针，输出 `maps/day_map_{day}.png`（1180×400）。
-3. **当天景点图 Spot photo**：优先精准实拍（Pexels/自备）；对中国小众地标用 **ImageGen 工具**按精准地标提示词生成写实图（1536×1024），
+3. **当天景点图 Spot photo**：**优先 Pexels 精准实拍**（真实、可溯源）；仅当 Pexels 搜不到该景点对应图（尤其中国小众地标）时，才用 **ImageGen 工具**按精准地标提示词生成写实图（1536×1024），
    放 `spot_photos/spot_{day}.png`，**contain 原比例**嵌入下框（绝不拉伸压扁）。
 
 ## 生成命令 / Build
@@ -121,7 +148,7 @@ For city tours without per-day GPS routes. Background uses Pexels precise photos
 `templates/trip_data_template.py` 定义 `days` / `hotels` / `timeline` / `budget` / `photo_map` / `TRIP_TITLE` 等。
 
 ## 图片管线 / Image pipeline
-1. **优先 Pexels 实拍**：`scripts/fetch_trip.py` 按精准英文关键词搜索，按 `alt` 相关性打分 + 排除错城词，自动挑最贴合图。
+1. **优先 Pexels 实拍**（需先配置 Pexels API Key，见上文「前置配置」）：`scripts/fetch_trip.py` 按精准英文关键词搜索，按 `alt` 相关性打分 + 排除错城词，自动挑最贴合图。
 2. **Pexels 无精准图 → ImageGen 生成**：对中国小众地标用 ImageGen 定点生成（100% 贴合），再后处理统一风格。
 3. **后处理**：所有图裁到 1920×1080，压暗 0.82 + 提饱和 1.05 + 提对比 1.06，**不要 duotone/灰度**（用户要求背景非黑白）。
 

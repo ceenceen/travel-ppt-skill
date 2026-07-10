@@ -45,7 +45,7 @@
 本 skill 强依赖结构化数据。若你只说「做个旅行PPT」却没给足材料，agent 会**先问再动手**，不会凭空捏造（尤其 GPS 坐标、真实地名、里程、住宿点、文案）。常见澄清项：
 
 - **模式选择**：自驾/环线（有逐日 GPS 路线）走模式 B；城市观光走模式 A。
-- **模式 B 缺料**：逐日路线（起点→途经→终点）、每日文案（行程说明/经典介绍/注意事项/住宿点）、图片策略（AI 生成 / Pexels 实拍 / 你自备）。
+- **模式 B 缺料**：逐日路线（起点→途经→终点）、每日文案（行程说明/经典介绍/注意事项/住宿点）、图片策略（默认优先 Pexels 实拍；无合适图再用 AI 生成 / 你自备）。
 - **模式 A 缺料**：行程标题、城市与天数、酒店、预算、背景图关键词。
 - **输出偏好**：文件名、是否要预算页/住宿页、语言（中文 / 中英双语）。
 
@@ -69,6 +69,18 @@ travel-ppt-skill/
 └── references/
     └── roadtrip_layout.md         # 模式 B 权威排版规格（坐标 / 配色 / 字体）
 ```
+
+### 配置 Pexels API Key（首次使用前）
+
+模式 A（城市游）默认用 **Pexels 高清实拍** 作背景。首次使用前需配置一个免费 Pexels API Key（约 1 分钟）：
+
+1. 打开 https://www.pexels.com/api/ ，登录后点击「Get Started」免费申请 Key。
+2. 二选一配置：
+   - **环境变量（推荐）**：`PEXELS_API_KEY=你的key`，脚本自动读取。
+   - **密钥文件**：把 key 写进 `scripts/pexels_key.txt`（一行，可加 `#` 注释）。
+3. 验证：`python scripts/fetch_trip.py --map '{"beijing":["Forbidden City Beijing"]}'` 能抓到图即成功。
+
+图片策略：**优先 Pexels 真实摄影**（画面真实、版权可溯源，脚本生成 CREDITS.txt 署名）；仅当某目的地在 Pexels 搜不到贴合图时，才回退 ImageGen 生成。注意：Pexels 要求署名，请保留 CREDITS.txt；Key 属私密，勿提交进公开仓库。
 
 ### 快速开始 · 模式 B（自驾环线）
 
@@ -129,7 +141,7 @@ python <skill>/scripts/gen_pptx.py <数据模块.py> <输出.pptx> \
 This skill depends heavily on structured data. If you only say "make a travel PPT" without enough material, the agent will **ask first, then build** — it will not fabricate (especially GPS coords, real place names, distances, stays, copy). Typical clarifications:
 
 - **Mode choice**: self-drive/loop (day-by-day GPS route) → Mode B; city tour → Mode A.
-- **Mode B gaps**: per-day route (start → via → end), per-day copy (trip notes / highlights / cautions / stays), image strategy (AI-generated / Pexels real shots / your own).
+- **Mode B gaps**: per-day route (start → via → end), per-day copy (trip notes / highlights / cautions / stays), image strategy (prefer Pexels real shots by default; use AI-generated / your own only when no good match).
 - **Mode A gaps**: trip title, cities & days, hotels, budget, background keyword.
 - **Output prefs**: file name, whether to include budget/stay pages, language (zh / bilingual).
 
@@ -153,6 +165,18 @@ travel-ppt-skill/
 └── references/
     └── roadtrip_layout.md         # Mode B authoritative layout spec (coords / palette / fonts)
 ```
+
+### Configure Pexels API Key (before first use)
+
+Mode A (city tour) uses **Pexels high-res photos** for backgrounds by default. Configure a free Pexels API Key before first use (~1 min):
+
+1. Go to https://www.pexels.com/api/ , sign in and click "Get Started" to get a free key.
+2. Either way works:
+   - **Env var (recommended)**: `PEXELS_API_KEY=your_key` — the script reads it automatically.
+   - **Key file**: put the key in `scripts/pexels_key.txt` (one line; `#` for comments).
+3. Verify: `python scripts/fetch_trip.py --map '{"beijing":["Forbidden City Beijing"]}'` fetches an image → OK.
+
+Image strategy: **prefer Pexels real photography** (authentic, attributable — the script writes CREDITS.txt); fall back to ImageGen only when a destination has no fitting Pexels shot. Note: Pexels requires attribution — keep CREDITS.txt; keep the key private, never commit it into a public repo.
 
 ### Quick start · Mode B (Roadtrip)
 
