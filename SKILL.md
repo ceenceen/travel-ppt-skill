@@ -28,6 +28,25 @@ Render a **structured itinerary** into an editable 16:9 PPTX: cover → route ov
 
 ---
 
+## 信息不足时主动询问 / Ask proactively when info is missing
+
+本 skill 强依赖结构化数据。用户只说「做个旅行PPT / travel deck」而没给足材料时，**不要凭空捏造**（尤其 GPS 坐标、真实地名、里程、住宿点、文案），应先用 `AskUserQuestion` 澄清，再动手。
+This skill depends heavily on structured data. If the user only says "make a travel PPT / travel deck" without enough material, **do not fabricate** (especially GPS coords, real place names, distances, stays, copy) — clarify with `AskUserQuestion` first, then build.
+
+出发前必问（按需裁剪，不必一次全问）/ Ask up front (trim as needed, not all at once):
+- **模式选择 Mode**: 自驾/环线（有逐日 GPS 路线）→ 模式 B；城市观光（无路线）→ 模式 A。
+- **模式 B 缺什么 What Mode B needs**:
+  - 逐日路线 day-by-day route（每天 起点→途经→终点）。坐标(WGS-84)最好给；不给则问能否按地名推断或请用户补，绝不编造。
+  - 每日文案 per-day copy：行程说明 / 经典介绍 / 注意事项 / 住宿点。缺失则请用户直接给，或由 agent 据路线先起草、再让用户改。
+  - 图片策略 image strategy：背景风光照 + 当天景点图，用「AI 生成 / Pexels 实拍 / 用户自备」哪种？先定策略再生成。
+- **模式 A 缺什么 What Mode A needs**: 行程标题、城市/天数、酒店、预算；背景图关键词或自备图。Pexels 需要关键词，缺失则问。
+- **输出偏好 output prefs**: 文件名、是否要预算页/住宿页、语言（中文 / 中英双语）。
+
+原则 / Rule of thumb: **缺数据先问、缺图先定策略、绝不编造坐标与事实**。问清后再跑生成器，避免返工。
+Ask before building when data is missing, decide image strategy before generating, never invent coordinates or facts. Clarify first, then run the generator to avoid rework.
+
+---
+
 # 模式 B · 自驾 / 户外环线（重点） Mode B · Roadtrip / Outdoor Loop (focus)
 
 适用：自驾、摩旅、骑行、徒步等有明确逐日路线与 GPS 坐标的行程。

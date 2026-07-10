@@ -40,6 +40,17 @@
 - **可编辑输出**：python-pptx 生成，所有文字/图片后续可在 PowerPoint 直接改。
 - **自动防锁**：PPTX 被打开导致写入失败时，脚本自动换名输出，不阻塞流程。
 
+### 信息不足时主动询问
+
+本 skill 强依赖结构化数据。若你只说「做个旅行PPT」却没给足材料，agent 会**先问再动手**，不会凭空捏造（尤其 GPS 坐标、真实地名、里程、住宿点、文案）。常见澄清项：
+
+- **模式选择**：自驾/环线（有逐日 GPS 路线）走模式 B；城市观光走模式 A。
+- **模式 B 缺料**：逐日路线（起点→途经→终点）、每日文案（行程说明/经典介绍/注意事项/住宿点）、图片策略（AI 生成 / Pexels 实拍 / 你自备）。
+- **模式 A 缺料**：行程标题、城市与天数、酒店、预算、背景图关键词。
+- **输出偏好**：文件名、是否要预算页/住宿页、语言（中文 / 中英双语）。
+
+原则：缺数据先问、缺图先定策略、绝不编造坐标与事实。
+
 ### 仓库结构
 
 ```
@@ -112,6 +123,17 @@ python <skill>/scripts/gen_pptx.py <数据模块.py> <输出.pptx> \
 - **Native-ratio spot photos**: Spot images are embedded with `contain` at native aspect ratio — **never stretched**.
 - **Editable output**: Built with python-pptx; all text/images remain editable in PowerPoint.
 - **Lock-safe**: If the PPTX is open (write lock), the script auto-renames the output instead of blocking.
+
+### Ask when info is missing
+
+This skill depends heavily on structured data. If you only say "make a travel PPT" without enough material, the agent will **ask first, then build** — it will not fabricate (especially GPS coords, real place names, distances, stays, copy). Typical clarifications:
+
+- **Mode choice**: self-drive/loop (day-by-day GPS route) → Mode B; city tour → Mode A.
+- **Mode B gaps**: per-day route (start → via → end), per-day copy (trip notes / highlights / cautions / stays), image strategy (AI-generated / Pexels real shots / your own).
+- **Mode A gaps**: trip title, cities & days, hotels, budget, background keyword.
+- **Output prefs**: file name, whether to include budget/stay pages, language (zh / bilingual).
+
+Rule of thumb: ask before building when data is missing, decide image strategy before generating, never invent coordinates or facts.
 
 ### Repository structure
 
