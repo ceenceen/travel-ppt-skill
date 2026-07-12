@@ -34,7 +34,8 @@
 
 ### 功能特性
 
-- **双模式**：城市游（无 GPS 路线）与自驾/环线（有逐日 GPS 路线）各一套生成管线。
+- **三模式**：城市游（无 GPS 路线）、自驾/环线（有逐日 GPS 路线）、景点图鉴（按主题网格陈列全部景点）各一套生成管线。
+- **景点图鉴（模式 C）**：把一趟行程的所有景点按主题分组做成紧凑网格陈列，每格一张实拍 + 景点名 + 到达日标签；抓图阶段**全局去重 + 感知哈希二次核查**，保证整套图鉴无重复图。
 - **真实地图**：模式 B 用高德卫星瓦片（国内直连、免 API key）生成真实路线地图，自动做 WGS-84 → GCJ-02 坐标转换，紧贴当天路线缩放并标绘轨迹。
 - **原比例景点图**：景点图以 `contain` 原比例居中嵌入，**绝不拉伸压扁**。
 - **可编辑输出**：python-pptx 生成，所有文字/图片后续可在 PowerPoint 直接改。
@@ -62,14 +63,19 @@ travel-ppt-skill/
 │   ├── fetch_trip.py              # 模式 A：按关键词从 Pexels 拉取精准实拍
 │   ├── make_routes.py             # 模式 A：路线辅助
 │   ├── gen_maps.py                # 模式 B：真实路线地图生成器（高德瓦片）
-│   └── gen_pptx_roadtrip.py       # 模式 B：每日双框排版 PPTX 生成器
+│   ├── gen_pptx_roadtrip.py       # 模式 B：每日双框排版 PPTX 生成器
+│   ├── fetch_spot_photos.py       # 模式 C：从 Pexels 抓景点图（全局去重 + 感知哈希二次核查）
+│   └── gen_spot_gallery.py        # 模式 C：景点图鉴网格排版 PPTX 生成器
 ├── templates/
 │   ├── trip_data_template.py      # 模式 A 数据模板
-│   └── roadtrip_data_template.py  # 模式 B 数据模板（含阿里南线 14 天全量示例）
+│   ├── roadtrip_data_template.py  # 模式 B 数据模板（含阿里南线 14 天全量示例）
+│   └── spot_gallery_template.py   # 模式 C 数据模板（含西藏南线 35 景点示例）
 ├── references/
-│   └── roadtrip_layout.md         # 模式 B 权威排版规格（坐标 / 配色 / 字体）
+│   ├── roadtrip_layout.md         # 模式 B 权威排版规格（坐标 / 配色 / 字体）
+│   └── spot_gallery_layout.md     # 模式 C 权威排版规格（网格 / 配色 / 字体）
 └── examples/
-    └── 西藏自驾环线-Tibet-self driving.pdf   # 案例：用本 skill 生成的阿里南线 14 天自驾环线 PPT（双语）
+    ├── 西藏自驾环线-Tibet-self driving.pdf   # 案例：用本 skill 生成的阿里南线 14 天自驾环线 PPT（双语）
+    └── 西藏景点图鉴.pptx                       # 案例：用模式 C 生成的西藏南线景点图鉴（4 页网格 + 到达日）
 ```
 
 ### 配置 Pexels API Key（首次使用前）
@@ -109,6 +115,26 @@ python <skill>/scripts/gen_pptx.py <数据模块.py> <输出.pptx> \
 
 背景图由 `fetch_trip.py` 按精准英文关键词从 Pexels 拉取，Pexels 无图时回退 ImageGen 生成；统一裁到 1920×1080 并轻度压暗/提饱和，**保持非黑白**。
 
+### 快速开始 · 模式 C（景点图鉴）
+
+适合做「行程看点清单 / 景点手册」附册：把全部景点按主题网格陈列，每格一张实拍 + 景点名 + 到达日。
+
+1. **准备数据**：复制 `templates/spot_gallery_template.py` 到旅行目录，按真实景点填 `GROUPS`（分组）、`SPOT_QUERIES`（每个景点的 Pexels 英文搜索词 + 期望关键词）、`DAYS`（可选，到达日）。西藏南线 35 景点示例已内置，可直接改。
+2. **抓图（去重 + 二次核查）**：
+   ```bash
+   cd /path/to/your/trip
+   python <skill>/scripts/fetch_spot_photos.py --data spot_gallery_data.py   # 输出 spot_gallery/*.jpg + CREDITS.txt
+   ```
+   脚本自动全局去重（无重复图）并做感知哈希二次核查；Pexels 搜不到的小众地标写入 `spot_gallery/_fallback.txt`。
+3. **（可选）AI 兜底**：对 `_fallback.txt` 里的地标，用 ImageGen 工具按地标提示词生成写实图，放入同名 `spot_gallery/{景点名}.jpg`。
+4. **生成 PPTX**：
+   ```bash
+   python <skill>/scripts/gen_spot_gallery.py --data spot_gallery_data.py --out 景点图鉴.pptx
+   ```
+5. **改景点**：只改数据模块，重跑即可，无需动布局代码。
+
+> 版式：深色背景 + 白强调（橘色图标已改白）+ 微软雅黑；杂志式紧凑网格（间距 0.12in），图片 cover 裁切填满；每格底部半透明黑条 + 白色小方块 + 白字名称 + `Day N` 标签。详见 `references/spot_gallery_layout.md`。
+
 ### 排版规范
 
 权威坐标见 `references/roadtrip_layout.md`（模式 B）。要点：
@@ -118,23 +144,21 @@ python <skill>/scripts/gen_pptx.py <数据模块.py> <输出.pptx> \
 - 背景用 **cover 铺满**（按原比例缩放 + 居中裁切），绝不固定尺寸拉伸。
 - 配色：黑底、白字、橘色强调 `(232,109,78)`；字体微软雅黑。
 
+**景点图鉴（模式 C）** 权威坐标见 `references/spot_gallery_layout.md`：深色背景 `(11,14,20)` + **白强调**（橘色图标已改白）+ 微软雅黑；杂志式紧凑网格（gutter 0.12in），图片 cover 裁切填满；每格底部半透明黑条 + 白色小方块 + 白字名称 + `Day N` 标签。
+
 生成后建议用 `SKILL.md` 末尾的校验脚本扫描越界 shape，并确认景点图比例未被拉伸。
 
 ### 依赖
 
 - 模式 B：`python-pptx`、`Pillow`、`numpy`、`matplotlib`（生成地图需联网）。
 - 模式 A：`python-pptx`、`Pillow`、`openpyxl`、`requests`（Pexels）。
+- 模式 C：`python-pptx`、`Pillow`、`requests`（Pexels 抓图 + 感知哈希去重）；小众地标兜底用 ImageGen 工具。
 - 安装：`python -m pip install python-pptx Pillow numpy matplotlib openpyxl requests`
 
 ### 案例 / Examples
-<img width="1604" height="897" alt="image" src="https://github.com/user-attachments/assets/9fda3ea7-c7a3-45f7-b586-6add91e9f440" /><img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/66ef0201-f3b7-4ec8-ac88-948ba2aae1c9" />
-<img width="1603" height="901" alt="image" src="https://github.com/user-attachments/assets/9ac0955f-0522-4fc4-8230-8aeb48379d03" /><img width="1602" height="899" alt="image" src="https://github.com/user-attachments/assets/818c332c-a6b4-468a-a825-cbd3885dfc2b" />
-<img width="1606" height="908" alt="image" src="https://github.com/user-attachments/assets/c88da36f-ea6e-4746-ad06-6540ab78f015" />
-<img width="1601" height="896" alt="image" src="https://github.com/user-attachments/assets/63551a81-17e1-45bf-8008-033d16e65e1d" />
-
-
 
 - `examples/西藏自驾环线-Tibet-self driving.pdf` — 用本 skill（模式 B · 自驾环线）生成的**阿里南线 14 天自驾环线**行程册样例：全幅背景 + 右上真实路线地图 + 右下当天景点图（原比例）+ 左列四块文字。可直接打开参考版式与排版。
+- `examples/西藏景点图鉴.pptx` — 用本 skill（模式 C · 景点图鉴）生成的**西藏南线景点图鉴**样例：4 页紧凑网格（神山/圣湖/寺庙/遗址）、每格实拍 + 景点名 + 到达日标签，可打开参考版式。
 
 ---
 
@@ -142,7 +166,8 @@ python <skill>/scripts/gen_pptx.py <数据模块.py> <输出.pptx> \
 
 ### Features
 
-- **Two modes**: City tour (no GPS route) and Roadtrip / outdoor loop (day-by-day GPS route), each with its own pipeline.
+- **Three modes**: City tour (no GPS route), Roadtrip / outdoor loop (day-by-day GPS route), and Spot Gallery (themed grid of all spots) — each with its own pipeline.
+- **Spot Gallery (Mode C)**: all trip spots laid out as a compact themed grid, each cell = one real photo + name + arrival-day tag. Fetch stage does **global dedup + perceptual-hash second pass**, guaranteeing no duplicate image across the gallery.
 - **Real maps**: Mode B renders real route maps from AMap satellite tiles (direct in CN, no API key), auto-converts WGS-84 → GCJ-02, zooms tightly to the day's route and overlays the trajectory.
 - **Native-ratio spot photos**: Spot images are embedded with `contain` at native aspect ratio — **never stretched**.
 - **Editable output**: Built with python-pptx; all text/images remain editable in PowerPoint.
@@ -170,14 +195,19 @@ travel-ppt-skill/
 │   ├── fetch_trip.py              # Mode A: pull precise photos from Pexels by keyword
 │   ├── make_routes.py             # Mode A: route helper
 │   ├── gen_maps.py                # Mode B: real route map generator (AMap tiles)
-│   └── gen_pptx_roadtrip.py       # Mode B: daily dual-frame PPTX generator
+│   ├── gen_pptx_roadtrip.py       # Mode B: daily dual-frame PPTX generator
+│   ├── fetch_spot_photos.py       # Mode C: pull spot photos from Pexels (global dedup + perceptual-hash 2nd pass)
+│   └── gen_spot_gallery.py        # Mode C: spot-gallery grid PPTX generator
 ├── templates/
 │   ├── trip_data_template.py      # Mode A data template
-│   └── roadtrip_data_template.py  # Mode B data template (full Ali-Nan 14-day sample)
+│   ├── roadtrip_data_template.py  # Mode B data template (full Ali-Nan 14-day sample)
+│   └── spot_gallery_template.py   # Mode C data template (full Tibet-South 35-spot sample)
 ├── references/
-│   └── roadtrip_layout.md         # Mode B authoritative layout spec (coords / palette / fonts)
+│   ├── roadtrip_layout.md         # Mode B authoritative layout spec (coords / palette / fonts)
+│   └── spot_gallery_layout.md     # Mode C authoritative layout spec (grid / palette / fonts)
 └── examples/
-    └── 西藏自驾环线-Tibet-self driving.pdf   # Sample: Ali-Nan 14-day roadtrip PPT built with this skill (bilingual)
+    ├── 西藏自驾环线-Tibet-self driving.pdf   # Sample: Ali-Nan 14-day roadtrip PPT built with this skill (bilingual)
+    └── 西藏景点图鉴.pptx                       # Sample: Tibet-South spot gallery built with Mode C (4 grid slides + arrival days)
 ```
 
 ### Configure Pexels API Key (before first use)
@@ -217,6 +247,26 @@ python <skill>/scripts/gen_pptx.py <data_module.py> <output.pptx> \
 
 Background photos are fetched from Pexels by precise English keywords via `fetch_trip.py`; falls back to ImageGen when Pexels has none. All images are cropped to 1920×1080 with light dimming/saturation — **kept in color, not B/W**.
 
+### Quick start · Mode C (Spot Gallery)
+
+Good as a "trip highlights / spot list" add-on: all spots in a themed grid, each cell = one real photo + name + arrival day.
+
+1. **Prepare data**: Copy `templates/spot_gallery_template.py` into your trip folder and fill `GROUPS` (groups), `SPOT_QUERIES` (per-spot Pexels English query + expected keywords), and `DAYS` (optional, arrival day). A full 35-spot Tibet-South sample is built in — edit it directly.
+2. **Fetch photos (dedup + 2nd pass)**:
+   ```bash
+   cd /path/to/your/trip
+   python <skill>/scripts/fetch_spot_photos.py --data spot_gallery_data.py   # writes spot_gallery/*.jpg + CREDITS.txt
+   ```
+   The script auto-dedups (no duplicate images) and runs a perceptual-hash second pass; spots Pexels can't match are written to `spot_gallery/_fallback.txt`.
+3. **(Optional) AI fallback**: For landmarks in `_fallback.txt`, use the ImageGen tool with a landmark prompt and save to the matching `spot_gallery/{spot}.jpg`.
+4. **Generate PPTX**:
+   ```bash
+   python <skill>/scripts/gen_spot_gallery.py --data spot_gallery_data.py --out 景点图鉴.pptx
+   ```
+5. **Edit spots**: Change only the data module and re-run — no layout code changes.
+
+> Layout: dark background + white accent (orange icons changed to white) + Microsoft YaHei; magazine-style tight grid (gutter 0.12in), images cover-cropped to fill; each cell has a translucent black bar + white square + white name + `Day N` tag. See `references/spot_gallery_layout.md`.
+
 ### Layout spec
 
 Authoritative coordinates are in `references/roadtrip_layout.md` (Mode B). Key points:
@@ -226,17 +276,21 @@ Authoritative coordinates are in `references/roadtrip_layout.md` (Mode B). Key p
 - Background uses **cover** (scale + center crop), never fixed-size stretch.
 - Palette: black background, white text, orange accent `(232,109,78)`; font Microsoft YaHei.
 
+**Spot Gallery (Mode C)** authoritative coordinates are in `references/spot_gallery_layout.md`: dark background `(11,14,20)` + **white accent** (orange icons changed to white) + Microsoft YaHei; magazine-style tight grid (gutter 0.12in), images cover-cropped to fill; each cell has a translucent black bar + white square + white name + `Day N` tag.
+
 After building, scan for overflowing shapes with the validation snippet at the end of `SKILL.md`, and confirm spot images keep their aspect ratio.
 
 ### Dependencies
 
 - Mode B: `python-pptx`, `Pillow`, `numpy`, `matplotlib` (map gen needs network).
 - Mode A: `python-pptx`, `Pillow`, `openpyxl`, `requests` (Pexels).
+- Mode C: `python-pptx`, `Pillow`, `requests` (Pexels fetch + perceptual-hash dedup); ImageGen tool for obscure-landmark fallback.
 - Install: `python -m pip install python-pptx Pillow numpy matplotlib openpyxl requests`
 
 ### Examples
 
 - `examples/西藏自驾环线-Tibet-self driving.pdf` — a sample **Ali-Nan 14-day self-drive loop** deck built with this skill (Mode B · Roadtrip): full-bleed background + top-right real route map + bottom-right spot photo (native ratio) + 4-block left column. Open it to see the layout.
+- `examples/西藏景点图鉴.pptx` — a sample **Tibet-South spot gallery** built with this skill (Mode C · Spot Gallery): 4 grid slides (sacred mountains / holy lakes / temples / ruins) with real photos + names + arrival-day tags. Open it to see the layout.
 
 ---
 

@@ -1,7 +1,7 @@
 ---
 name: travel-ppt
-description: 把结构化行程数据渲染成 16:9 可编辑旅行 PPTX。支持两种模式：① 城市多日游（Pexels 实拍 + 单栏背景）；② 自驾 / 户外环线（真实路线地图 + 每日双框排版：全幅背景 + 右上真实地图 + 右下景点图原比例 + 左列四块文字）。触发词：行程PPT / 旅行PPT / 旅游攻略PPT / 自驾PPT / 环线PPT / itinerary slideshow / travel deck / roadtrip PPT / self-drive itinerary。
-version: 2.0.0
+description: 把结构化行程数据渲染成 16:9 可编辑旅行 PPTX。支持三种模式：① 城市多日游（Pexels 实拍 + 单栏背景）；② 自驾 / 户外环线（真实路线地图 + 每日双框排版：全幅背景 + 右上真实地图 + 右下景点图原比例 + 左列四块文字）；③ 景点图鉴（按主题分组的紧凑网格陈列，每格景点实拍 + 到达日标签，深色高级风、白强调）。触发词：行程PPT / 旅行PPT / 旅游攻略PPT / 自驾PPT / 环线PPT / 景点图鉴 / 景点清单 / 看点手册 / itinerary slideshow / travel deck / roadtrip PPT / self-drive itinerary / spot gallery / highlights catalogue。
+version: 3.0.0
 disable: false
 ---
 
@@ -11,10 +11,11 @@ disable: false
 把一份**结构化行程数据**渲染成 16:9 可编辑 PPTX：封面 → 路线总览 → 关键数据 → **每天单独一页** → 预算 → 住宿 → 收尾。
 Render a **structured itinerary** into an editable 16:9 PPTX: cover → route overview → key stats → **one slide per day** → budget → stay → closing.
 
-本 skill 含两种模式 / This skill ships two modes:
+本 skill 含三种模式 / This skill ships three modes:
 
 - **模式 A · 城市多日游 City Multi-day Tour**：Pexels 精准实拍作背景（非黑白），单栏排版。见 `scripts/gen_pptx.py` + `templates/trip_data_template.py`。
 - **模式 B · 自驾 / 户外环线 Roadtrip / Outdoor Loop**：全幅背景 + 右上**真实路线地图**（高德卫星瓦片）+ 右下**当天景点图（原比例）** + 左列四块文字。见 `scripts/gen_maps.py` + `scripts/gen_pptx_roadtrip.py` + `templates/roadtrip_data_template.py` + `references/roadtrip_layout.md`。
+- **模式 C · 景点图鉴 Spot Gallery**：把一趟行程的所有景点按主题分组，做**紧凑网格陈列**（深色高级风、白强调、极小间距），每格一张景点实拍 + 景点名 + **到达日标签**。见 `scripts/fetch_spot_photos.py`（抓图 + 全局去重 + 感知哈希二次核查）+ `scripts/gen_spot_gallery.py`（排版）+ `templates/spot_gallery_template.py`（数据模板）+ `references/spot_gallery_layout.md`。适合做「行程看点清单 / 景点手册」附册。
 
 ---
 
@@ -52,6 +53,8 @@ Mode A (city tour) uses **Pexels high-res photos** for backgrounds by default; c
   Mentions "one slide per day", "itinerary PPT", "travel deck", "roadtrip PPT", etc.
 - 自驾/环线类行程 → 优先**模式 B**（带真实地图）；城市观光类 → **模式 A**。
   Self-drive / loop trips → prefer **Mode B** (with real map); city tours → **Mode A**.
+- 想单独做「景点图鉴 / 景点清单 / 看点手册」——把所有景点按主题网格陈列、每格带到达日 → **模式 C**。
+  Want a standalone "spot gallery / highlights list" — all spots in a themed grid, each cell with arrival day → **Mode C**.
 
 ---
 
@@ -139,6 +142,38 @@ python <skill>/scripts/gen_pptx_roadtrip.py   # 后：生成 <TRIP_TITLE>-roadtr
 
 ---
 
+# 模式 C · 景点图鉴（新增） Mode C · Spot Gallery (new)
+
+适用：在行程册之外，单独做一本「**所有景点图鉴**」——按主题分组（神山/圣湖/寺庙/遗址…），每组一页紧凑网格，每格一张景点实拍 + 景点名 + 到达日标签。常用作行程册的「看点清单 / 景点手册」附册。
+For: a standalone "spot catalogue" of the whole trip — grouped by theme, one compact grid slide per group, each cell = one spot photo + name + arrival-day tag. Great as a "highlights / spot list" add-on to the itinerary deck.
+
+## 数据约定 / Data schema
+复制 `templates/spot_gallery_template.py` 到旅行目录，按真实景点填三个字段：
+Copy `templates/spot_gallery_template.py` into your trip folder and fill three fields:
+
+- `GROUPS`：`[(中文主题名, 英文副标, [景点中文名...]), ...]` —— 分组与每页景点。
+- `SPOT_QUERIES`：`{景点中文名: (Pexels英文搜索词, [期望关键词...])}` —— 精准搜图 + alt 相关性打分；务必给小众地标精准英文（地名 + landmark 类型）。
+- `DAYS`：`{景点中文名: 到达日(int)}` —— **可选**；提供后每个景点名旁显示「Day N」标签。
+
+## 图片管线 / Image pipeline
+1. **抓图（去重 + 二次核查）**：`scripts/fetch_spot_photos.py` 从 **Pexels** 按 `SPOT_QUERIES` 搜 landscape 图，alt 相关性打分挑最佳；
+   - **全局去重**：photo id 与 md5 一旦被占用就顺延下一张，保证整套图鉴**无重复图**；
+   - **感知哈希二次核查**：算每图 8×8 平均哈希，任意两图距离 ≤ 6 视为近似重复，对后者重抓并强制其与全场其他图距离 ≥ 10；
+   - 写出 `spot_gallery/{景点名}.jpg` 与 `CREDITS.txt`（Pexels 署名，需随 deck 保留）；Pexels 搜不到的写 `spot_gallery/_fallback.txt`。
+2. **缺图兜底**：`_fallback.txt` 里的小众地标（如古格遗址、札达土林）由 agent 用 **ImageGen 工具**按地标提示词生成写实图，放入同名 `spot_gallery/{景点名}.jpg`。
+3. **排版**：深色背景 `BK=(11,14,20)` + **白强调**（橘色图标已改白）+ 微软雅黑；杂志式紧凑网格（gutter 0.12in），图片按单元格比例 **cover 裁切填满**（无白边），底部半透明黑条 + 白色小方块 + 白字可编辑名称 + `Day N` 标签。详见 `references/spot_gallery_layout.md`。
+
+## 生成命令 / Build
+```bash
+cd /path/to/your/trip        # 旅行目录（含 spot_gallery_data.py）
+python <skill>/scripts/fetch_spot_photos.py --data spot_gallery_data.py   # 先：抓图(去重+二次核查)
+python <skill>/scripts/gen_spot_gallery.py  --data spot_gallery_data.py --out 景点图鉴.pptx  # 后：生成
+```
+- 若输出 PPTX 被用户打开导致 `PermissionError`，脚本自动换名输出（不阻塞）。
+- 改景点只改数据模块，重新运行即可，无需动布局代码。
+
+---
+
 # 模式 A · 城市多日游（保留） Mode A · City Multi-day Tour (legacy)
 
 适用：城市游、多城串联，无逐日 GPS 路线。背景用 Pexels 精准实拍（非黑白）。
@@ -191,7 +226,8 @@ print("越界 shape 数:", bad)
 ## 依赖 / Dependencies
 - 模式 B：`python-pptx`、`Pillow`、`numpy`、`matplotlib`（生成地图需联网下载高德瓦片）。
 - 模式 A：`python-pptx`、`Pillow`、`openpyxl`（读预算表）、`requests`（Pexels）。
-- managed python 缺包：`python -m pip install python-pptx Pillow numpy matplotlib openpyxl`。
+- 模式 C：`python-pptx`、`Pillow`、`requests`（Pexels 抓图 + 感知哈希去重）；`ImageGen` 工具用于小众地标兜底。
+- managed python 缺包：`python -m pip install python-pptx Pillow numpy matplotlib openpyxl requests`。
 
 ## 经验沉淀 / Lessons learned
 - 自驾/环线行程，**真实地图比手绘色块强得多**；高德瓦片国内直连免 key，但坐标是 GCJ-02，需把 GPS(WGS-84) 先转换。
