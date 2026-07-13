@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""模式 C · 景点图鉴：从 Pexels 抓取每个景点的精准实拍，全局去重 + 感知距离二次核查。
+"""景点图鉴：从 Pexels 抓取每个景点的精准实拍，全局去重 + 感知距离二次核查。
 
 用法 / Usage:
   python fetch_spot_photos.py --data spot_gallery_data.py [--out spot_gallery]

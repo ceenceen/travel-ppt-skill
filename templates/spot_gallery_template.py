@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# 景点图鉴数据模板 / Spot Gallery data template (模式 C)
+# 景点图鉴数据模板 / Spot Gallery data template
 #
 # 复制本文件到你的旅行目录，按真实行程修改后：
 #   python <skill>/scripts/fetch_spot_photos.py --data spot_gallery_data.py   # 抓图(全局去重+二次核查)

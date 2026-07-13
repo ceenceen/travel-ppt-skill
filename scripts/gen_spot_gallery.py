@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""模式 C · 景点图鉴：把 GROUPS + DAYS 渲染成深色高级网格 PPTX（travel-ppt 视觉体系）。
+"""景点图鉴：把 GROUPS + DAYS 渲染成深色高级网格 PPTX（travel-ppt 视觉体系）。
 
 用法 / Usage:
   python gen_spot_gallery.py --data spot_gallery_data.py --out 景点图鉴.pptx

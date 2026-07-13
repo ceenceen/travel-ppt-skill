@@ -1,5 +1,5 @@
 # 景点图鉴 · 网格排版规范（Spot Gallery Layout）
-# Spot Gallery — Grid Layout Spec (Mode C)
+# Spot Gallery — Grid Layout Spec
 
 > 本文件是 `scripts/gen_spot_gallery.py` 的版式权威说明，供复用 skill 时参考。
 > Authoritative layout reference for `scripts/gen_spot_gallery.py`.
@@ -15,7 +15,7 @@ List **all spots** of a trip as a compact gallery: grouped by theme, one slide p
 
 ## 1. 画布 Canvas
 - 尺寸：16:9，13.33 in × 7.5 in。
-- 深色背景 `BK=(11,14,20)`（接近纯黑，比模式 B 的 (0,0,0) 稍暖，更显高级）。
+- 深色背景 `BK=(11,14,20)`（接近纯黑，比行程册黑底 (0,0,0) 稍暖，更显高级）。
 - 强调色用**白色**（用户要求去掉橘色）：标题下划线、右上「N 处」计数、每格小方块均为白 `(255,255,255)`。可改回橘 `(232,109,78)` 只需改 `ACCENT`。
 - 字体：微软雅黑 `Microsoft YaHei`。
 
