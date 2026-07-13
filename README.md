@@ -1,4 +1,3 @@
-<img width="1266" height="710" alt="image" src="https://github.com/user-attachments/assets/025e7361-82aa-44f5-b0c0-e995ac8912f9" /><img width="1266" height="710" alt="image" src="https://github.com/user-attachments/assets/8f425054-b072-4ccb-a4e2-9666ea9c501f" /># travel-ppt
 
 > 把结构化行程数据渲染成 **16:9 可编辑 PPTX** 的 WorkBuddy skill。
 > Render a **structured itinerary** into an editable 16:9 PPTX — a WorkBuddy skill.
@@ -192,8 +191,8 @@ python <skill>/scripts/gen_pptx.py <数据模块.py> <输出.pptx> \
 
 | 寺庙 · 人文 / Temples & Culture | 遗址 · 风貌 / Ruins & Landscapes |
 |---------------------------------|-----------------------------------|
-| ![景点图鉴<img width="1272" height="710" alt="image" src="https://github.com/user-attachments/assets/183b5615-3df5-42a2-9b6a-a3adc8e9a420" />
-]| ![景点图鉴]<img width="1266" height="710" alt="image" src="https://github.com/user-attachments/assets/4e42a8c0-f2a4-480e-9591-5f2e2abad0d1" />
+| ![景点图鉴]<img width="1272" height="710" alt="image" src="https://github.com/user-attachments/assets/183b5615-3df5-42a2-9b6a-a3adc8e9a420" />
+| ![景点图鉴]<img width="1266" height="710" alt="image" src="https://github.com/user-attachments/assets/4e42a8c0-f2a4-480e-9591-5f2e2abad0d1" />
  |
 
 | Day 1 · 拉萨 → 日喀则 / Lhasa → Shigatse |
