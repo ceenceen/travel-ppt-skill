@@ -21,6 +21,8 @@
   - [快速开始 · 景点图鉴](#快速开始--景点图鉴)
   - [排版规范](#排版规范)
   - [依赖](#依赖)
+  - [案例展示 / Showcase](#案例展示--showcase)
+  - [案例 / Examples](#案例--examples)
 - [English](#english)
   - [Features](#features)
   - [Repository structure](#repository-structure)
@@ -29,6 +31,8 @@
   - [Quick start · Spot Gallery](#quick-start--spot-gallery)
   - [Layout spec](#layout-spec)
   - [Dependencies](#dependencies)
+  - [Showcase](#showcase)
+  - [Examples](#examples)
 - [许可证 / License](#许可证--license)
 
 ---
@@ -77,9 +81,18 @@ travel-ppt-skill/
 ├── references/
 │   ├── roadtrip_layout.md         # 自驾/户外环线权威排版规格（坐标 / 配色 / 字体）
 │   └── spot_gallery_layout.md     # 景点图鉴权威排版规格（网格 / 配色 / 字体）
-└── examples/
-    ├── 西藏自驾环线-Tibet-self driving.pdf   # 案例：用本 skill 生成的阿里南线 14 天自驾环线 PPT（双语）
-    └── 西藏景点图鉴.pptx                       # 案例：用本 skill 生成的西藏南线景点图鉴（4 页网格 + 到达日）
+├── examples/
+│   ├── 西藏自驾环线-Tibet-self driving.pdf   # 案例：用本 skill 生成的阿里南线 14 天自驾环线 PPT（双语）
+│   └── 西藏景点图鉴.pptx                       # 案例：用本 skill 生成的西藏南线景点图鉴（4 页网格 + 到达日）
+└── assets/
+    └── examples/                    # 案例实拍截图（README 展示用）
+        ├── tibet-cover.jpg
+        ├── tibet-overview.jpg
+        ├── tibet-spot-mountains.jpg
+        ├── tibet-spot-lakes.jpg
+        ├── tibet-spot-temples.jpg
+        ├── tibet-spot-ruins.jpg
+        └── tibet-day1.jpg
 ```
 
 ### 配置 Pexels API Key（首次使用前）
@@ -163,6 +176,26 @@ python <skill>/scripts/gen_pptx.py <数据模块.py> <输出.pptx> \
 - `examples/西藏自驾环线-Tibet-self driving.pdf` — 用本 skill（自驾/户外环线场景）生成的**阿里南线 14 天自驾环线**行程册样例：全幅背景 + 右上真实路线地图 + 右下当天景点图（原比例）+ 左列四块文字。可直接打开参考版式与排版。
 - `examples/西藏景点图鉴.pptx` — 用本 skill（景点图鉴场景）生成的**西藏南线景点图鉴**样例：4 页紧凑网格（神山/圣湖/寺庙/遗址）、每格实拍 + 景点名 + 到达日标签，可打开参考版式。
 
+### 案例展示 / Showcase
+
+> 下方为西藏南线 14 天自驾环线 + 景点图鉴的实机页面截图。
+
+| 封面 / Cover | 行程概览 / Overview |
+|--------------|---------------------|
+| ![西藏南线封面](assets/examples/tibet-cover.jpg) | ![行程概览](assets/examples/tibet-overview.jpg) |
+
+| 神山 · 雪山 / Sacred Mountains | 圣湖 · 湖泊 / Holy Lakes |
+|------------------------------|-------------------------|
+| ![神山雪山](assets/examples/tibet-spot-mountains.jpg) | ![圣湖湖泊](assets/examples/tibet-spot-lakes.jpg) |
+
+| 寺庙 · 人文 / Temples & Culture | 遗址 · 风貌 / Ruins & Landscapes |
+|---------------------------------|-----------------------------------|
+| ![寺庙人文](assets/examples/tibet-spot-temples.jpg) | ![遗址风貌](assets/examples/tibet-spot-ruins.jpg) |
+
+| Day 1 · 拉萨 → 日喀则 / Lhasa → Shigatse |
+|------------------------------------------|
+| ![Day 1](assets/examples/tibet-day1.jpg) |
+
 ---
 
 ## English
@@ -209,9 +242,18 @@ travel-ppt-skill/
 ├── references/
 │   ├── roadtrip_layout.md         # Roadtrip / outdoor loop authoritative layout spec (coords / palette / fonts)
 │   └── spot_gallery_layout.md     # Spot Gallery authoritative layout spec (grid / palette / fonts)
-└── examples/
-    ├── 西藏自驾环线-Tibet-self driving.pdf   # Sample: Ali-Nan 14-day roadtrip PPT built with this skill (bilingual)
-    └── 西藏景点图鉴.pptx                       # Sample: Tibet-South spot gallery built with this skill (4 grid slides + arrival days)
+├── examples/
+│   ├── 西藏自驾环线-Tibet-self driving.pdf   # Sample: Ali-Nan 14-day roadtrip PPT built with this skill (bilingual)
+│   └── 西藏景点图鉴.pptx                       # Sample: Tibet-South spot gallery built with this skill (4 grid slides + arrival days)
+└── assets/
+    └── examples/                    # Showcase screenshots used in README
+        ├── tibet-cover.jpg
+        ├── tibet-overview.jpg
+        ├── tibet-spot-mountains.jpg
+        ├── tibet-spot-lakes.jpg
+        ├── tibet-spot-temples.jpg
+        ├── tibet-spot-ruins.jpg
+        └── tibet-day1.jpg
 ```
 
 ### Configure Pexels API Key (before first use)
@@ -294,6 +336,26 @@ After building, scan for overflowing shapes with the validation snippet at the e
 
 - `examples/西藏自驾环线-Tibet-self driving.pdf` — a sample **Ali-Nan 14-day self-drive loop** deck built with this skill (Roadtrip / outdoor loop scenario): full-bleed background + top-right real route map + bottom-right spot photo (native ratio) + 4-block left column. Open it to see the layout.
 - `examples/西藏景点图鉴.pptx` — a sample **Tibet-South spot gallery** built with this skill (Spot Gallery scenario): 4 grid slides (sacred mountains / holy lakes / temples / ruins) with real photos + names + arrival-day tags. Open it to see the layout.
+
+### Showcase
+
+> Screenshots of the Tibet-South 14-day roadtrip + spot gallery deck.
+
+| Cover | Overview |
+|-------|----------|
+| ![Tibet South Cover](assets/examples/tibet-cover.jpg) | ![Overview](assets/examples/tibet-overview.jpg) |
+
+| Sacred Mountains | Holy Lakes |
+|------------------|------------|
+| ![Sacred Mountains](assets/examples/tibet-spot-mountains.jpg) | ![Holy Lakes](assets/examples/tibet-spot-lakes.jpg) |
+
+| Temples & Culture | Ruins & Landscapes |
+|-------------------|---------------------|
+| ![Temples & Culture](assets/examples/tibet-spot-temples.jpg) | ![Ruins & Landscapes](assets/examples/tibet-spot-ruins.jpg) |
+
+| Day 1 · Lhasa → Shigatse |
+|--------------------------|
+| ![Day 1](assets/examples/tibet-day1.jpg) |
 
 ---
 
