@@ -137,6 +137,7 @@ python <skill>/scripts/gen_pptx.py <数据模块.py> <输出.pptx> \
 适合做「行程看点清单 / 景点手册」附册：把全部景点按主题网格陈列，每格一张实拍 + 景点名 + 到达日。
 
 1. **准备数据**：复制 `templates/spot_gallery_template.py` 到旅行目录，按真实景点填 `GROUPS`（分组）、`SPOT_QUERIES`（每个景点的 Pexels 英文搜索词 + 期望关键词）、`DAYS`（可选，到达日）。西藏南线 35 景点示例已内置，可直接改。
+   - 排序：`SORT='theme'`（默认，按主题分组）或 `SORT='day'`（按 `DAYS` 升序全局时间线，从 Day 1 起连续铺开）。
 2. **抓图（去重 + 二次核查）**：
    ```bash
    cd /path/to/your/trip
@@ -174,7 +175,7 @@ python <skill>/scripts/gen_pptx.py <数据模块.py> <输出.pptx> \
 ### 案例 / Examples
 
 - `examples/西藏自驾环线-Tibet-self driving.pdf` — 用本 skill（自驾/户外环线场景）生成的**阿里南线 14 天自驾环线**行程册样例：全幅背景 + 右上真实路线地图 + 右下当天景点图（原比例）+ 左列四块文字。可直接打开参考版式与排版。
-- `examples/西藏景点图鉴.pptx` — 用本 skill（景点图鉴场景）生成的**西藏南线景点图鉴**样例：4 页紧凑网格（神山/圣湖/寺庙/遗址）、每格实拍 + 景点名 + 到达日标签，可打开参考版式。
+- `examples/西藏景点图鉴.pptx` — 用本 skill（景点图鉴场景）生成的**西藏南线景点图鉴**样例：按到达日（`SORT='day'`）全局时间线排序，3 页紧凑网格、每格实拍 + 景点名 + 到达日标签，可打开参考版式。
 
 ### 案例展示 / Showcase
 
@@ -298,6 +299,7 @@ Background photos are fetched from Pexels by precise English keywords via `fetch
 Good as a "trip highlights / spot list" add-on: all spots in a themed grid, each cell = one real photo + name + arrival day.
 
 1. **Prepare data**: Copy `templates/spot_gallery_template.py` into your trip folder and fill `GROUPS` (groups), `SPOT_QUERIES` (per-spot Pexels English query + expected keywords), and `DAYS` (optional, arrival day). A full 35-spot Tibet-South sample is built in — edit it directly.
+   - Sort order: `SORT='theme'` (default, grouped by theme) or `SORT='day'` (sorted globally by `DAYS` ascending, a continuous timeline from Day 1).
 2. **Fetch photos (dedup + 2nd pass)**:
    ```bash
    cd /path/to/your/trip
@@ -335,7 +337,7 @@ After building, scan for overflowing shapes with the validation snippet at the e
 ### Examples
 
 - `examples/西藏自驾环线-Tibet-self driving.pdf` — a sample **Ali-Nan 14-day self-drive loop** deck built with this skill (Roadtrip / outdoor loop scenario): full-bleed background + top-right real route map + bottom-right spot photo (native ratio) + 4-block left column. Open it to see the layout.
-- `examples/西藏景点图鉴.pptx` — a sample **Tibet-South spot gallery** built with this skill (Spot Gallery scenario): 4 grid slides (sacred mountains / holy lakes / temples / ruins) with real photos + names + arrival-day tags. Open it to see the layout.
+- `examples/西藏景点图鉴.pptx` — a sample **Tibet-South spot gallery** built with this skill (Spot Gallery scenario): sorted globally by arrival day (`SORT='day'`), 3 grid slides with real photos + names + arrival-day tags. Open it to see the layout.
 
 ### Showcase
 

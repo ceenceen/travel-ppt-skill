@@ -158,6 +158,7 @@ Copy `templates/spot_gallery_template.py` into your trip folder and fill three f
 - `GROUPS`：`[(中文主题名, 英文副标, [景点中文名...]), ...]` —— 分组与每页景点。
 - `SPOT_QUERIES`：`{景点中文名: (Pexels英文搜索词, [期望关键词...])}` —— 精准搜图 + alt 相关性打分；务必给小众地标精准英文（地名 + landmark 类型）。
 - `DAYS`：`{景点中文名: 到达日(int)}` —— **可选**；提供后每个景点名旁显示「Day N」标签。
+- `SORT`：`'theme' | 'day'` —— **可选**，默认 `'theme'`（按 `GROUPS` 分组渲染）；设 `'day'` 时**忽略分组、按 `DAYS` 升序全局时间线排序**（从 Day 1 起），所有景点跨页连续铺开，每页标题显示该页覆盖的 Day 区间。
 
 ## 图片管线 / Image pipeline
 1. **抓图（去重 + 二次核查）**：`scripts/fetch_spot_photos.py` 从 **Pexels** 按 `SPOT_QUERIES` 搜 landscape 图，alt 相关性打分挑最佳；

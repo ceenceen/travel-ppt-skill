@@ -7,6 +7,8 @@
 数据模块需定义 / The data module must define:
   GROUPS : [(cn_theme, en_sub, [spot_cn, ...]), ...]
   DAYS   : {spot_cn: int}   # 可选，用于每个景点名旁的「Day N」标签
+  SORT   : 'theme' | 'day'  # 可选，默认 'theme'（按 GROUPS 分组）；
+                            #   'day' 时忽略分组、按 DAYS 升序全局时间线排序（从 Day 1 起）
 
 版式：深色背景 + 白色强调（原橘色图标已改白）+ 微软雅黑；杂志式紧凑网格，
 图片按单元格比例 cover 裁切填满（无白边），底部半透明黑条 + 白色小方块 + 白字可编辑名称 + Day N 标签。
@@ -172,16 +174,37 @@ def main():
     mod = load_data(a.data)
     days = getattr(mod, 'DAYS', {})
     GROUPS = getattr(mod, 'GROUPS', [])
+    title = getattr(mod, 'TRIP_TITLE', '景点图鉴')
+    SORT = getattr(mod, 'SORT', 'theme')
 
     prs = Presentation()
     prs.slide_width = Inches(13.333)
     prs.slide_height = Inches(7.5)
     build_grid.prs = prs
 
-    for cn_name, en_name, spots in GROUPS:
-        build_grid(cn_name, en_name, spots, days)
+    if SORT == 'day':
+        # 收集全部景点 → 按 DAYS 升序全局时间线（从 Day 1 起），无 DAYS 的排末尾
+        all_spots = []
+        for _cn, _en, spots in GROUPS:
+            all_spots.extend(spots)
+        seen, uniq = set(), []
+        for s in all_spots:
+            if s not in seen:
+                seen.add(s); uniq.append(s)
+        uniq.sort(key=lambda s: days.get(s, 999))  # 稳定排序，同日保持原顺序
+        CHUNK = 12
+        chunks = [uniq[i:i + CHUNK] for i in range(0, len(uniq), CHUNK)]
+        n = len(chunks)
+        for idx, sp in enumerate(chunks):
+            dmin = min(days.get(s, 999) for s in sp)
+            dmax = max(days.get(s, 0) for s in sp)
+            sub = f'DAY {dmin}' if dmin == dmax else f'DAY {dmin} – DAY {dmax}'
+            build_grid(title, f'{sub} · 按到达日排序 {idx + 1}/{n}', sp, days)
+    else:
+        for cn_name, en_name, spots in GROUPS:
+            build_grid(cn_name, en_name, spots, days)
     prs.save(a.out)
-    print(f'SAVED {a.out}  slides={len(prs.slides._sldIdLst)}')
+    print(f'SAVED {a.out}  slides={len(prs.slides._sldIdLst)}  sort={SORT}')
 
 
 if __name__ == '__main__':

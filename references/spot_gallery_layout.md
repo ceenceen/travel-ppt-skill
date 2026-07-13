@@ -11,6 +11,12 @@
 
 List **all spots** of a trip as a compact gallery: grouped by theme, one slide per group, each cell = one spot photo + name + arrival-day tag. Good as a "trip highlights / spot catalogue" add-on.
 
+### 排序模式 / Sort mode
+数据模块的 `SORT` 字段控制渲染顺序：
+- `SORT='theme'`（默认）：按 `GROUPS` 分组，每组一页。
+- `SORT='day'`：忽略分组，把所有景点按 `DAYS` 升序**全局时间线排序**（从 Day 1 起），跨页连续铺开；每页中文标题取 `TRIP_TITLE`，英文副标显示该页覆盖的 `DAY x – DAY y` 区间 + 「按到达日排序 k/n」。
+The `SORT` field in the data module controls ordering: `'theme'` (default, grouped) or `'day'` (all spots sorted globally by `DAYS` ascending, a continuous timeline from Day 1, paginated; each page's subtitle shows the `DAY x – DAY y` range it covers).
+
 ---
 
 ## 1. 画布 Canvas
