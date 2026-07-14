@@ -1,3 +1,4 @@
+# travel-ppt
 
 > 把结构化行程数据渲染成 **16:9 可编辑 PPTX** 的 WorkBuddy skill。
 > Render a **structured itinerary** into an editable 16:9 PPTX — a WorkBuddy skill.
@@ -76,7 +77,8 @@ travel-ppt-skill/
 ├── templates/
 │   ├── trip_data_template.py      # 城市多日游数据模板
 │   ├── roadtrip_data_template.py  # 自驾/户外环线数据模板（含阿里南线 14 天全量示例）
-│   └── spot_gallery_template.py   # 景点图鉴数据模板（含西藏南线 35 景点示例）
+│   ├── spot_gallery_template.py   # 景点图鉴数据模板（含西藏南线 35 景点示例）
+│   └── 29day/                      # 29 天川藏大环线端到端生成器（数据+地图+双框页+43 处图鉴），见其 README
 ├── references/
 │   ├── roadtrip_layout.md         # 自驾/户外环线权威排版规格（坐标 / 配色 / 字体）
 │   └── spot_gallery_layout.md     # 景点图鉴权威排版规格（网格 / 配色 / 字体）
@@ -176,6 +178,10 @@ python <skill>/scripts/gen_pptx.py <数据模块.py> <输出.pptx> \
 - `examples/西藏自驾环线-Tibet-self driving.pdf` — 用本 skill（自驾/户外环线场景）生成的**阿里南线 14 天自驾环线**行程册样例：全幅背景 + 右上真实路线地图 + 右下当天景点图（原比例）+ 左列四块文字。可直接打开参考版式与排版。
 - `examples/西藏景点图鉴.pptx` — 用本 skill（景点图鉴场景）生成的**西藏南线景点图鉴**样例：按到达日（`SORT='day'`）全局时间线排序，3 页紧凑网格、每格实拍 + 景点名 + 到达日标签，可打开参考版式。
 
+### 端到端长线模板 / Full-loop long-distance template
+
+- `templates/29day/` — **29 天川藏大环线自驾端到端生成器**（成都 → G318 川藏南线含稻城亚丁 → 拉萨 → 西藏南线 14 天环线 → G317 川藏北线 → 成都，约 6200 km）。它把「数据建模 → 真实路线地图 → 每日双框页 → 景点图鉴（43 处，覆盖 Day 1–22）→ AI 图去水印」串成完整流水线，可直接复制改数据复用。其 `README.md` 说明文件角色、运行方式与图片资源准备（仓库不含大体积图片）。
+
 ### 案例展示 / Showcase
 
 > 下方为西藏南线 14 天自驾环线 + 景点图鉴的实机页面截图。
@@ -186,14 +192,11 @@ python <skill>/scripts/gen_pptx.py <数据模块.py> <输出.pptx> \
 
 | 神山 · 雪山 / Sacred Mountains | 圣湖 · 湖泊 / Holy Lakes |
 |------------------------------|-------------------------|
-| ![景点图鉴]<img width="1272" height="709" alt="image" src="https://github.com/user-attachments/assets/e59fa2cb-c7bc-4763-97ed-325a61dc284d" />
- | ![圣湖湖泊](assets/examples/tibet-spot-lakes.jpg) |
+| ![神山雪山](assets/examples/tibet-spot-mountains.jpg) | ![圣湖湖泊](assets/examples/tibet-spot-lakes.jpg) |
 
 | 寺庙 · 人文 / Temples & Culture | 遗址 · 风貌 / Ruins & Landscapes |
 |---------------------------------|-----------------------------------|
-| ![景点图鉴]<img width="1272" height="710" alt="image" src="https://github.com/user-attachments/assets/183b5615-3df5-42a2-9b6a-a3adc8e9a420" />
-| ![景点图鉴]<img width="1266" height="710" alt="image" src="https://github.com/user-attachments/assets/4e42a8c0-f2a4-480e-9591-5f2e2abad0d1" />
- |
+| ![寺庙人文](assets/examples/tibet-spot-temples.jpg) | ![遗址风貌](assets/examples/tibet-spot-ruins.jpg) |
 
 | Day 1 · 拉萨 → 日喀则 / Lhasa → Shigatse |
 |------------------------------------------|
@@ -241,7 +244,8 @@ travel-ppt-skill/
 ├── templates/
 │   ├── trip_data_template.py      # City tour data template
 │   ├── roadtrip_data_template.py  # Roadtrip / outdoor loop data template (full Ali-Nan 14-day sample)
-│   └── spot_gallery_template.py   # Spot Gallery data template (full Tibet-South 35-spot sample)
+│   ├── spot_gallery_template.py   # Spot Gallery data template (full Tibet-South 35-spot sample)
+│   └── 29day/                      # 29-day Chengdu–Lhasa–G317 full-loop generator (data + maps + dual-frame + 43-spot gallery); see its README
 ├── references/
 │   ├── roadtrip_layout.md         # Roadtrip / outdoor loop authoritative layout spec (coords / palette / fonts)
 │   └── spot_gallery_layout.md     # Spot Gallery authoritative layout spec (grid / palette / fonts)
@@ -340,6 +344,10 @@ After building, scan for overflowing shapes with the validation snippet at the e
 
 - `examples/西藏自驾环线-Tibet-self driving.pdf` — a sample **Ali-Nan 14-day self-drive loop** deck built with this skill (Roadtrip / outdoor loop scenario): full-bleed background + top-right real route map + bottom-right spot photo (native ratio) + 4-block left column. Open it to see the layout.
 - `examples/西藏景点图鉴.pptx` — a sample **Tibet-South spot gallery** built with this skill (Spot Gallery scenario): sorted globally by arrival day (`SORT='day'`), 3 grid slides with real photos + names + arrival-day tags. Open it to see the layout.
+
+### Full-loop long-distance template
+
+- `templates/29day/` — a **29-day Chengdu–Lhasa–G317 full-loop self-drive generator** (Chengdu → G318 Sichuan-Tibet South line incl. Daocheng Yading → Lhasa → Tibet-South 14-day loop → G317 Sichuan-Tibet North line → Chengdu, ~6200 km). It chains "data modelling → real route maps → daily dual-frame pages → spot gallery (43 spots, Day 1–22) → AI-watermark cropping" into one pipeline; copy and edit the data to reuse. Its `README.md` explains file roles, how to run, and image-asset prep (large images are not committed).
 
 ### Showcase
 

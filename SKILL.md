@@ -128,6 +128,10 @@ S = [
 完整可运行模板见 `templates/roadtrip_data_template.py`（含阿里南线 14 天全量数据）。
 Full runnable template: `templates/roadtrip_data_template.py` (Ali-Nan line 14-day sample).
 
+## 29 天完整环线模板（端到端示例）/ 29-day full-loop template (end-to-end)
+`templates/29day/` 是一套**完整可复用的 29 天长途环线生成器**（成都 → G318 川藏南线含稻城亚丁 → 拉萨 → 西藏南线 14 天环线 → G317 川藏北线 → 成都，约 6200 km）。它把本 skill 的三类场景串成一条流水线：数据建模(`trip_data.py`) → 真实路线地图(`gen_maps.py`) → 每日双框页 + 景点图鉴(`gen_29day.py`，43 处图鉴覆盖 Day 1–22) → AI 图去水印(`crop_watermark.py`)。
+见 `templates/29day/README.md` 了解文件角色、运行方式与图片资源准备（仓库不含大体积图片；西藏段真照用 `TIBET_PHOTO_DIR` 环境变量指向，川藏段背景用 ImageGen 生成后去水印）。
+
 ## 图片管线 / Image pipeline
 1. **背景 / 通用风光照 Background**：用户自备横版图（≥1920×1080），放 `images/`，cover 铺满。
 2. **真实路线地图 Real route map**：`gen_maps.py` 下载高德卫星瓦片（style=6）+ 中文注记（style=8），
